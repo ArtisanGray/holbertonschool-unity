@@ -5,28 +5,16 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public CharacterController controller;
+    public GameObject Camera;
     public float speed = 8f;
     public float jumpSpeed;
     public float gravity;
-    private float dY;
+    private float dY = 0;
     // Start is called before the first frame update
     void Start()
     {
         
     }
-    /*private void OnCollisionStay(Collision collision)
-    {
-        GameObject parentname = collision.gameObject;
-        if (parentname.transform.parent.name == "Platforms")
-            isGrounded = true;
-        Debug.Log("touching something");
-
-    }
-    private void OnCollisionExit(Collision collision)
-    {
-        isGrounded = false;
-    }*/
-    // Update is called once per frame
     void Update()
     {
         Vector3 moveto = new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
@@ -39,6 +27,13 @@ public class PlayerController : MonoBehaviour
         }
         dY -= gravity * Time.deltaTime;
         moveto.y = dY;
+        moveto = transform.rotation * moveto;
         controller.Move(moveto * speed * Time.deltaTime);
+
+        if (transform.position.y < -100)
+        {
+            transform.position = new Vector3(0, 100, 0);
+            dY = 0;
+        }
     }
 }
