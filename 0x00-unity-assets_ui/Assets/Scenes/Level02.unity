@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: db8a39fcfd94b68488a756948d02074c, type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -4890,6 +4890,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5084015743202945285, guid: cc5b12c0fc5018a4c934e68fd6bbf3b1, type: 3}
+      propertyPath: m_FontData.m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: b7bbb20a7aa5e194fa677ad6693d976e, type: 3}
     - target: {fileID: 5084015743634717591, guid: cc5b12c0fc5018a4c934e68fd6bbf3b1, type: 3}
       propertyPath: m_Name
       value: TimerCanvas
@@ -4904,7 +4908,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5084015743634717595, guid: cc5b12c0fc5018a4c934e68fd6bbf3b1, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5084015743634717595, guid: cc5b12c0fc5018a4c934e68fd6bbf3b1, type: 3}
       propertyPath: m_AnchorMax.x

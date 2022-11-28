@@ -11,6 +11,7 @@ public class OptionsMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Cursor.visible = true;
         Inverted.GetComponent<Toggle>().isOn = bool.Parse(PlayerPrefs.GetString("InvertY"));
         applySettings.GetComponent<Button>().onClick.AddListener(Apply);
     }
@@ -22,6 +23,7 @@ public class OptionsMenu : MonoBehaviour
     }
     public void Back()
     {
+        Cursor.visible = false;
         SceneManager.LoadScene(PlayerPrefs.GetString("LastScene"));
     }
     public void InvertY()
@@ -34,6 +36,7 @@ public class OptionsMenu : MonoBehaviour
     public void Apply()
     {
         InvertY();
+        Cursor.visible = false;
         SceneManager.LoadScene(PlayerPrefs.GetString("LastScene"));
     }
 }

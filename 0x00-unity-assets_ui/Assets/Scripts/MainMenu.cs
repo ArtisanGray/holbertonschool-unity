@@ -8,7 +8,7 @@ public class MainMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        Cursor.visible = true;
     }
 
     // Update is called once per frame
@@ -18,6 +18,7 @@ public class MainMenu : MonoBehaviour
     }
     public void LevelSelect(int level)
     {
+        Cursor.visible = false;
         if (level == 1)
         {
             SceneManager.LoadScene("Level01");

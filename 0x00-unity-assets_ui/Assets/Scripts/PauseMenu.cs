@@ -21,9 +21,15 @@ public class PauseMenu : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (Time.timeScale != 0f)
+            {
+                Cursor.visible = true;
                 Pause();
+            }
             else
+            {
+                Cursor.visible = false;
                 Resume();
+            }
         }
     }
     public void Pause()
