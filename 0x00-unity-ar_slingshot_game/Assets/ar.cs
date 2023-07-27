@@ -23,7 +23,6 @@ public class ar : MonoBehaviour
     public Pose planePose;
     public GameObject selectedPlane;
     public NavMeshAgent selectedTarget;
-    private NavMeshTriangulation whereiGo;
     private List<NavMeshAgent> targets = new List<NavMeshAgent>();
 
     public Text touch;
@@ -34,7 +33,6 @@ public class ar : MonoBehaviour
 
     public int numEnemies = 5;
     public int score = 0;
-    private int _vertIndex;
 
     private void Awake()
     {
@@ -54,36 +52,42 @@ public class ar : MonoBehaviour
         {
             //_touchPos = Input.GetTouch(0).position;
             //touch.GetComponent<Text>().text = _touchPos.ToString();
-
-            if (_arManRay.Raycast(Input.GetTouch(0).position, hits, TrackableType.PlaneWithinPolygon))//-----> casts a ray from screen touch's position to plane facing main camera.
+            if (_arMan.enabled == true)
             {
-                planePose = hits[0].pose;
-                var planeId = hits[0].trackableId;
-                rCastInfo.GetComponent<Text>().text = planePose.ToString();
-
-                foreach (var plane in _arMan.trackables)//-----> deletes all other trackables on-screen to the one selected by the player.
+                if (_arManRay.Raycast(Input.GetTouch(0).position, hits, TrackableType.PlaneWithinPolygon))//-----> casts a ray from screen touch's position to plane facing main camera.
                 {
+                    planePose = hits[0].pose;
+                    var planeId = hits[0].trackableId;
+                    rCastInfo.GetComponent<Text>().text = planePose.ToString();
 
-                    if (plane.trackableId != planeId)
-                        Destroy(plane.gameObject);
-                    else
+                    foreach (var plane in _arMan.trackables)//-----> deletes all other trackables on-screen to the one selected by the player.
                     {
-                        selectedPlane = plane.gameObject;
-                        BakeMesh(selectedPlane);//-----> saves gameobject, bakes navmesh for enemies, and adds a sample target.
-                        _notifColors.normalColor = Color.cyan;//-----> changes the color and orientation of the "searching..." graphic to be a 'Start' button instead.
-                        _notifColors.pressedColor = new Color(0.0f, 0.3f, 0.3f);
-                        tNotification.transform.localPosition = new Vector3(0f, 0f, 0f);
-                        tNotification.transform.localScale = new Vector3(5f, 5f, 5f);
-                        tNotification.GetComponent<RectTransform>().sizeDelta = new Vector2(150f, 40f);
-                        tNotification.GetComponent<Button>().colors = _notifColors;
-                        tNotification.GetComponentInChildren<Text>().text = "Start";
-                        tNotification.interactable = true;
+
+                        if (plane.trackableId != planeId)
+                            Destroy(plane.gameObject);
+                        else
+                        {
+                            selectedPlane = plane.gameObject;
+                            BakeMesh(selectedPlane);//-----> saves gameobject, bakes navmesh for enemies, and adds a sample target.
+                            _notifColors.normalColor = Color.cyan;//-----> changes the color and orientation of the "searching..." graphic to be a 'Start' button instead.
+                            _notifColors.pressedColor = new Color(0.0f, 0.3f, 0.3f);
+                            tNotification.transform.localPosition = new Vector3(0f, 0f, 0f);
+                            tNotification.transform.localScale = new Vector3(5f, 5f, 5f);
+                            tNotification.GetComponent<RectTransform>().sizeDelta = new Vector2(150f, 40f);
+                            tNotification.GetComponent<Button>().colors = _notifColors;
+                            tNotification.GetComponentInChildren<Text>().text = "Start";
+                            tNotification.interactable = true;
+                        }
                     }
+                    _arMan.enabled = false;
+                    _arManRay.enabled = false;//-----> disables the Plane Manager and Raycast Manager so there are no more trackables added.
                 }
-                _arMan.enabled = false;
-                _arManRay.enabled = false;//-----> disables the Plane Manager and Raycast Manager so there are no more trackables added.
             }
         }
+        if (targets.Count > 0)
+        {
+            touch.GetComponent<Text>().text = targets[0].gameObject.transform.position.ToString();
+        }    
     }
     public void BakeMesh(GameObject sPlane)
     {
@@ -94,25 +98,31 @@ public class ar : MonoBehaviour
     }
     public void startGame()
     {
-        whereiGo = NavMesh.CalculateTriangulation();
         for (int i = 0; i < numEnemies; i++)
         {
-            addTargets(whereiGo);
+            addTargets();
         }
         scoreBoard.gameObject.SetActive(true);
         qButton.gameObject.SetActive(true);
         rButton.gameObject.SetActive(true);
         ammoSlide.gameObject.SetActive(true);
         tNotification.gameObject.SetActive(false);
-
     }
-    public void addTargets(NavMeshTriangulation targetNav)
+    public void addTargets()
     {
-        _vertIndex = Random.Range(0, targetNav.vertices.Length);
-        if (NavMesh.SamplePosition(targetNav.vertices[_vertIndex], out NavMeshHit hit, 2f, NavMesh.AllAreas))
+        //NavMeshTriangulation whereiGo = NavMesh.CalculateTriangulation();
+        //int _vertIndex = Random.Range(0, whereiGo.vertices.Length - 1);
+        NavMeshHit vertHit;
+        /*if (NavMesh.SamplePosition(planePose.position, out vertHit, 1f, NavMesh.AllAreas))
         {
-            targets.Add(Instantiate(selectedTarget, hit.position, planePose.rotation));
+            targets.Add(Instantiate(selectedTarget, vertHit.position, planePose.rotation));
+        }*/
+        targets.Add(Instantiate(selectedTarget, planePose.position, planePose.rotation));
+        if (NavMesh.SamplePosition(targets[targets.Count - 1].gameObject.transform.position, out vertHit, 1f, NavMesh.AllAreas))
+        {
+            targets[targets.Count - 1].gameObject.transform.position = vertHit.position;
         }
+        
     }
 
 }
