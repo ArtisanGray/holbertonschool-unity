@@ -23,6 +23,7 @@ public class ar : MonoBehaviour
     public Pose planePose;
     public GameObject selectedPlane;
     public NavMeshAgent selectedTarget;
+    private NavMeshTriangulation whereiGo;
     private List<NavMeshAgent> targets = new List<NavMeshAgent>();
 
     public Text touch;
@@ -33,6 +34,7 @@ public class ar : MonoBehaviour
 
     public int numEnemies = 5;
     public int score = 0;
+    private int _vertIndex;
 
     private void Awake()
     {
@@ -50,10 +52,10 @@ public class ar : MonoBehaviour
         }
         if (Input.touchCount > 0)
         {
-            _touchPos = Input.GetTouch(0).position;
-            touch.GetComponent<Text>().text = _touchPos.ToString();
+            //_touchPos = Input.GetTouch(0).position;
+            //touch.GetComponent<Text>().text = _touchPos.ToString();
 
-            if (_arManRay.Raycast(_touchPos, hits, TrackableType.PlaneWithinPolygon))//-----> casts a ray from screen touch's position to plane facing main camera.
+            if (_arManRay.Raycast(Input.GetTouch(0).position, hits, TrackableType.PlaneWithinPolygon))//-----> casts a ray from screen touch's position to plane facing main camera.
             {
                 planePose = hits[0].pose;
                 var planeId = hits[0].trackableId;
@@ -66,8 +68,8 @@ public class ar : MonoBehaviour
                         Destroy(plane.gameObject);
                     else
                     {
-                        selectedPlane = plane.gameObject;//-----> saves gameobject, bakes navmesh for enemies, and adds a sample target.
-                        BakeMesh(selectedPlane);
+                        selectedPlane = plane.gameObject;
+                        BakeMesh(selectedPlane);//-----> saves gameobject, bakes navmesh for enemies, and adds a sample target.
                         _notifColors.normalColor = Color.cyan;//-----> changes the color and orientation of the "searching..." graphic to be a 'Start' button instead.
                         _notifColors.pressedColor = new Color(0.0f, 0.3f, 0.3f);
                         tNotification.transform.localPosition = new Vector3(0f, 0f, 0f);
@@ -75,7 +77,7 @@ public class ar : MonoBehaviour
                         tNotification.GetComponent<RectTransform>().sizeDelta = new Vector2(150f, 40f);
                         tNotification.GetComponent<Button>().colors = _notifColors;
                         tNotification.GetComponentInChildren<Text>().text = "Start";
-                        tNotification.onClick.AddListener(startGame);
+                        tNotification.interactable = true;
                     }
                 }
                 _arMan.enabled = false;
@@ -92,23 +94,25 @@ public class ar : MonoBehaviour
     }
     public void startGame()
     {
+        whereiGo = NavMesh.CalculateTriangulation();
+        for (int i = 0; i < numEnemies; i++)
+        {
+            addTargets(whereiGo);
+        }
         scoreBoard.gameObject.SetActive(true);
         qButton.gameObject.SetActive(true);
         rButton.gameObject.SetActive(true);
         ammoSlide.gameObject.SetActive(true);
         tNotification.gameObject.SetActive(false);
-        NavMeshTriangulation whereiGo = NavMesh.CalculateTriangulation();
-        NavMeshHit BattleBusHit;
-        for (int i = 0; i < numEnemies; i++)
-        {
-            int vertIndex = Random.Range(0, whereiGo.vertices.Length);
-            if (NavMesh.SamplePosition(whereiGo.vertices[vertIndex], out BattleBusHit, 2f, NavMesh.AllAreas))
-            {
-                targets.Add(Instantiate(selectedTarget, BattleBusHit.position, planePose.rotation));
-            }
-            vertIndex = 0;
-        }
 
+    }
+    public void addTargets(NavMeshTriangulation targetNav)
+    {
+        _vertIndex = Random.Range(0, targetNav.vertices.Length);
+        if (NavMesh.SamplePosition(targetNav.vertices[_vertIndex], out NavMeshHit hit, 2f, NavMesh.AllAreas))
+        {
+            targets.Add(Instantiate(selectedTarget, hit.position, planePose.rotation));
+        }
     }
 
 }
